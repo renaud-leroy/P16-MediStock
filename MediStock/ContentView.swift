@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var session: SessionStore
+    @EnvironmentObject var medicineViewModel: MedicineStockViewModel
 
     var body: some View {
         Group {

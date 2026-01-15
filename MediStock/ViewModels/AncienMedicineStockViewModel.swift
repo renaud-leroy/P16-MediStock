@@ -1,11 +1,13 @@
 import Foundation
 import Firebase
 
-class MedicineStockViewModel: ObservableObject {
-    @Published var medicines: [Medicine] = []
-    @Published var aisles: [String] = []
-    @Published var history: [HistoryEntry] = []
-    private var db = Firestore.firestore()
+//class MedicineStockViewModel: ObservableObject {
+//    @Published var medicines: [Medicine] = []
+//    @Published var filterText: String = ""
+//    @Published var sortOption: SortOption = .none
+//    @Published var aisles: [String] = []
+//    @Published var history: [HistoryEntry] = []
+//    private var db = Firestore.firestore()
 
     func fetchMedicines() {
         db.collection("medicines").addSnapshotListener { (querySnapshot, error) in
@@ -109,5 +111,26 @@ class MedicineStockViewModel: ObservableObject {
                 } ?? []
             }
         }
+    }
+
+    var displayedMedicines: [Medicine] {
+        var result = medicines
+
+        if !filterText.isEmpty {
+            result = result.filter {
+                $0.name.lowercased().contains(filterText.lowercased())
+            }
+        }
+
+        switch sortOption {
+        case .name:
+            result = result.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        case .stock:
+            result = result.sorted { $0.stock < $1.stock }
+        case .none:
+            break
+        }
+
+        return result
     }
 }
