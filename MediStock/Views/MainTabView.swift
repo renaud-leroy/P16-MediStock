@@ -8,7 +8,7 @@ struct MainTabView: View {
                     Image(systemName: "list.dash")
                     Text("Aisles")
                 }
-
+            
             AllMedicinesView()
                 .tabItem {
                     Image(systemName: "square.grid.2x2")

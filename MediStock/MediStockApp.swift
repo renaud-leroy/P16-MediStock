@@ -13,8 +13,8 @@ import FirebaseCore
 @main
 struct MediStockApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    var sessionStore = SessionStore()
-    @StateObject private var medicineViewModel = MedicineStockViewModel()
+    @StateObject private var sessionStore = SessionStore()
+    @StateObject private var medicineViewModel = MedicineStockViewModel(repository: FirestoreMedicineRepository())
     
     var body: some Scene {
         WindowGroup {

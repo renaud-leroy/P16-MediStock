@@ -10,17 +10,21 @@ import Firebase
 
 
 protocol MedicineRepository {
-    func addMedicine(_ medicine: Medicine, user: String) async throws
+    func addMedicine(_ medicine: Medicine) async throws
     func updateMedicine(_ medicine: Medicine, user: String) async throws
-    func deleteMedicine(at offsets: IndexSet) async throws
-    func fetchMedicines(user: String) async throws -> [Medicine]
+    func deleteMedicine(id: String) async throws
+    func fetchMedicines() async throws -> [Medicine]
+    func fetchAisles() async throws -> [String]
+    func updateStock(medicineId: String, newStock: Int) async throws
+    func fetchHistory(medicineId: String) async throws -> [HistoryEntry]
+    func addHistory(_ history: HistoryEntry) async throws
 }
 
 final class FirestoreMedicineRepository: MedicineRepository {
     
     private let db = Firestore.firestore()
     
-    func addMedicine(_ medicine: Medicine, user: String) async throws {
+    func addMedicine(_ medicine: Medicine) async throws {
         do {
             try db.collection("medicines")
                 .document()
@@ -35,7 +39,7 @@ final class FirestoreMedicineRepository: MedicineRepository {
             throw MedicineError.missingId
         }
         do {
-            try await db.collection("medicines")
+            try db.collection("medicines")
                 .document(id)
                 .setData(from: medicine, merge: true)
         } catch {
@@ -43,31 +47,68 @@ final class FirestoreMedicineRepository: MedicineRepository {
         }
     }
     
-    func deleteMedicine(at offsets: IndexSet) async throws {
+    func deleteMedicine(id: String) async throws {
         do {
-            let snapshot = try await db.collection("medicines").getDocuments()
-
-            let documents = snapshot.documents
-
-            for index in offsets {
-                guard documents.indices.contains(index) else { continue }
-                let documentId = documents[index].documentID
-                try await db.collection("medicines")
-                    .document(documentId)
-                    .delete()
-            }
+            try await db.collection("medicines")
+                .document(id)
+                .delete()
         } catch {
             throw MedicineError.network(error)
         }
     }
     
-    func fetchMedicines(user: String) async throws -> [Medicine] {
+    func fetchMedicines() async throws -> [Medicine] {
         do {
             let snapshot = try await db.collection("medicines").getDocuments()
 
             return snapshot.documents.compactMap {
                 try? $0.data(as: Medicine.self)
             }
+        } catch {
+            throw MedicineError.network(error)
+        }
+    }
+    
+    func fetchAisles() async throws -> [String] {
+        do {
+            let snapshot = try await db.collection("medicines").getDocuments()
+            let aisles = snapshot.documents.compactMap { $0["aisle"] as? String }
+            return Array(Set(aisles)).sorted()
+        } catch {
+            throw MedicineError.network(error)
+        }
+    }
+    
+    func updateStock(medicineId: String, newStock: Int) async throws {
+        do {
+            try await db.collection("medicines")
+                .document(medicineId)
+                .updateData(["stock": newStock])
+        } catch {
+            throw MedicineError.network(error)
+        }
+    }
+    
+    func fetchHistory(medicineId: String) async throws -> [HistoryEntry] {
+        do {
+            let snapshot = try await db.collection("history")
+                .whereField("medicineId", isEqualTo: medicineId)
+                .order(by: "date", descending: true)
+                .getDocuments()
+            
+            return snapshot.documents.compactMap {
+                try? $0.data(as: HistoryEntry.self)
+            }
+        } catch {
+            throw MedicineError.network(error)
+        }
+    }
+    
+    func addHistory(_ history: HistoryEntry) async throws {
+        do {
+            try db.collection("history")
+                .document()
+                .setData(from: history)
         } catch {
             throw MedicineError.network(error)
         }

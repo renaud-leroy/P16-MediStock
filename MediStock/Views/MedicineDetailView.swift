@@ -4,35 +4,61 @@ struct MedicineDetailView: View {
     @State var medicine: Medicine
     @EnvironmentObject var viewModel: MedicineStockViewModel
     @EnvironmentObject var session: SessionStore
-
+    @State private var showDeleteAlert = false
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Title
-                Text(medicine.name)
-                    .font(.largeTitle)
-                    .padding(.top, 20)
-
-                // Medicine Name
-                medicineNameSection
-
-                // Medicine Stock
-                medicineStockSection
-
-                // Medicine Aisle
-                medicineAisleSection
-
-                // History Section
+        VStack(alignment: .leading, spacing: 20) {
+            // Title
+            Text(medicine.name)
+                .font(.largeTitle)
+            
+            // Medicine Name
+            medicineNameSection
+            
+            // Medicine Stock
+            medicineStockSection
+            
+            // Medicine Aisle
+            medicineAisleSection
+            
+            // History Section
+            ScrollView {
                 historySection
             }
-            .padding(.vertical)
         }
+        .padding()
         .navigationBarTitle("Medicine Details", displayMode: .inline)
-        .onAppear {
-            viewModel.fetchHistory(for: medicine)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button() {
+                    showDeleteAlert = true
+                } label: {
+                    Image(systemName: "trash")
+                }
+            }
         }
-        .onChange(of: medicine) {_, _ in
-            viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+        .task {
+            guard let id = medicine.id else { return }
+            await viewModel.loadHistory(for: id)
+        }
+        .onChange(of: medicine) {
+            Task {
+                await viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+            }
+        }
+        .alert("Souhaitez-vous supprimer ce médicament",
+               isPresented: $showDeleteAlert) {
+            Button("Confirmer", role: .destructive) {
+                Task {
+                    await viewModel.deleteMedicine(medicine)
+                    dismiss()
+                }
+            }
+
+            Button("Annuler", role: .cancel) { }
+        } message: {
+            Text("Attention cette action est définitive.")
         }
     }
 }
@@ -43,58 +69,64 @@ extension MedicineDetailView {
             Text("Name")
                 .font(.headline)
             TextField("Name", text: $medicine.name, onCommit: {
-                viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                Task {
+                    await viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                }
             })
             .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.bottom, 10)
         }
-        .padding(.horizontal)
     }
-
+    
     private var medicineStockSection: some View {
         VStack(alignment: .leading) {
             Text("Stock")
                 .font(.headline)
             HStack {
                 Button(action: {
-                    viewModel.decreaseStock(medicine, user: session.session?.uid ?? "")
+                    Task {
+                        medicine.stock -= 1
+                        await viewModel.decreaseStock(medicine, user: session.session?.uid ?? "")
+                    }
                 }) {
                     Image(systemName: "minus.circle")
                         .font(.title)
                         .foregroundColor(.red)
                 }
                 TextField("Stock", value: $medicine.stock, formatter: NumberFormatter(), onCommit: {
-                    viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                    Task {
+                        await viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                    }
                 })
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .keyboardType(.numberPad)
                 .frame(width: 100)
                 Button(action: {
-                    viewModel.increaseStock(medicine, user: session.session?.uid ?? "")
+                    Task {
+                        medicine.stock += 1
+                        await viewModel.increaseStock(medicine, user: session.session?.uid ?? "")
+                    }
                 }) {
                     Image(systemName: "plus.circle")
                         .font(.title)
                         .foregroundColor(.green)
                 }
             }
-            .padding(.bottom, 10)
         }
-        .padding(.horizontal)
     }
-
+    
     private var medicineAisleSection: some View {
         VStack(alignment: .leading) {
             Text("Aisle")
                 .font(.headline)
             TextField("Aisle", text: $medicine.aisle, onCommit: {
-                viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                Task {
+                    await viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                }
             })
             .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.bottom, 10)
         }
-        .padding(.horizontal)
     }
-
+    
     private var historySection: some View {
         VStack(alignment: .leading) {
             Text("History")
@@ -114,10 +146,8 @@ extension MedicineDetailView {
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
-                .padding(.bottom, 5)
             }
         }
-        .padding(.horizontal)
     }
 }
 

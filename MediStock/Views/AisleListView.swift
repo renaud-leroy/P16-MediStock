@@ -13,14 +13,9 @@ struct AisleListView: View {
                 }
             }
             .navigationBarTitle("Aisles")
-            .navigationBarItems(trailing: Button(action: {
-                viewModel.addRandomMedicine(user: "test_user") // Remplacez par l'utilisateur actuel
-            }) {
-                Image(systemName: "plus")
-            })
         }
-        .onAppear {
-            viewModel.fetchAisles()
+        .task {
+            await viewModel.loadAisles()
         }
     }
 }
@@ -28,6 +23,6 @@ struct AisleListView: View {
 struct AisleListView_Previews: PreviewProvider {
     static var previews: some View {
         AisleListView()
-            .environmentObject(MedicineStockViewModel())
+            .environmentObject(MedicineStockViewModel(repository: FirestoreMedicineRepository()))
     }
 }
