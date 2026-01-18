@@ -12,10 +12,9 @@ final class MedicineStockViewModel: ObservableObject {
     
     @Published var medicines: [Medicine] = []
     @Published var errorMessage: String?
-    @Published var filterText: String = ""
     @Published var aisles: [String] = []
     @Published var history: [HistoryEntry] = []
-    @Published var sortOption: SortOption = .none
+    @Published var sortOption: MedicineSortOption = .name
     
     private let repository: MedicineRepository
     
@@ -30,55 +29,40 @@ final class MedicineStockViewModel: ObservableObject {
             // gestion erreur à remplir
         }
     }
-    
-    func increaseStock(_ medicine: Medicine, user: String) async {
-        let newStock = medicine.stock + 1
-        try? await repository.updateStock(
-            medicineId: medicine.id!,
-            newStock: newStock
-        )
-        
-        let history = HistoryEntry(
-            medicineId: medicine.id!,
-            user: user,
-            action: "Increase stock",
-            details: "Stock from \(medicine.stock) to \(newStock)"
-        )
-        
-        try? await repository.addHistory(history)
-    }
-    
-    func decreaseStock(_ medicine: Medicine, user: String) async {
-        guard medicine.stock > 0 else { return }
-        
-        let newStock = medicine.stock - 1
-        
+
+    func updateStock(_ medicine: Medicine, to newStock: Int, user: String) async {
+        guard let id = medicine.id else { return }
+
         do {
-            try await repository.updateStock(
-                medicineId: medicine.id!,
-                newStock: newStock
-            )
-            
-            let history = HistoryEntry(
-                medicineId: medicine.id!,
+            try await repository.updateStock(medicineId: id, newStock: newStock)
+
+            guard medicine.stock != newStock else {
+                return
+            }
+
+            let entry = HistoryEntry(
+                medicineId: id,
                 user: user,
-                action: "Decrease stock",
-                details: "Stock from \(medicine.stock) to \(newStock)"
+                action: "Set stock",
+                details: "Stock from \(medicine.stock) to \(newStock)",
+                timestamp: Date()
             )
-            
-            try await repository.addHistory(history)
+
+            try await repository.addHistory(entry)
+            await loadHistory(for: id)
+            await loadMedicines()
         } catch {
             if let error = error as? LocalizedError {
                 errorMessage = error.errorDescription
             } else {
-                errorMessage = "Une erreur inattendue est survenue."
+                errorMessage = "Une erreur est survenue lors de la mise à jour du stock."
             }
         }
     }
     
     func loadMedicines() async {
         do {
-            medicines = try await repository.fetchMedicines()
+            medicines = try await repository.fetchMedicines(aisle: nil, sortBy: sortOption)
         } catch {
             if let error = error as? LocalizedError {
                 errorMessage = error.errorDescription
@@ -135,26 +119,5 @@ final class MedicineStockViewModel: ObservableObject {
                 errorMessage = "Une erreur est survenue lors du chargement de l’historique."
             }
         }
-    }
-    
-    var displayedMedicines: [Medicine] {
-        var result = medicines
-        
-        if !filterText.isEmpty {
-            result = result.filter {
-                $0.name.lowercased().contains(filterText.lowercased())
-            }
-        }
-        
-        switch sortOption {
-        case .name:
-            result = result.sorted { $0.name.lowercased() < $1.name.lowercased() }
-        case .stock:
-            result = result.sorted { $0.stock < $1.stock }
-        case .none:
-            break
-        }
-        
-        return result
     }
 }

@@ -13,7 +13,7 @@ protocol MedicineRepository {
     func addMedicine(_ medicine: Medicine) async throws
     func updateMedicine(_ medicine: Medicine, user: String) async throws
     func deleteMedicine(id: String) async throws
-    func fetchMedicines() async throws -> [Medicine]
+    func fetchMedicines(aisle: String?, sortBy: MedicineSortOption) async throws -> [Medicine]
     func fetchAisles() async throws -> [String]
     func updateStock(medicineId: String, newStock: Int) async throws
     func fetchHistory(medicineId: String) async throws -> [HistoryEntry]
@@ -26,9 +26,26 @@ final class FirestoreMedicineRepository: MedicineRepository {
     
     func addMedicine(_ medicine: Medicine) async throws {
         do {
-            try db.collection("medicines")
-                .document()
-                .setData(from: medicine)
+            // Création de l'id en local
+            let docRef = db.collection("medicines").document()
+
+            // Création de l'objet et injection de l'id dans celui-ci avant l'envoi vers firebase
+            var newMedicine = medicine
+            newMedicine.id = docRef.documentID
+
+            // Sauvegarde de l'objet
+            try docRef.setData(from: newMedicine)
+
+            // Ajout de la trace de l'id dans l'historique
+            let history = HistoryEntry(
+                medicineId: docRef.documentID,
+                user: "system",
+                action: "Add medicine",
+                details: "Medicine added"
+            )
+
+            try await addHistory(history)
+
         } catch {
             throw MedicineError.network(error)
         }
@@ -57,13 +74,25 @@ final class FirestoreMedicineRepository: MedicineRepository {
         }
     }
     
-    func fetchMedicines() async throws -> [Medicine] {
+    func fetchMedicines(aisle: String?, sortBy: MedicineSortOption) async throws -> [Medicine] {
         do {
-            let snapshot = try await db.collection("medicines").getDocuments()
+            var query: Query = db.collection("medicines")
 
-            return snapshot.documents.compactMap {
-                try? $0.data(as: Medicine.self)
-            }
+                if let aisle {
+                    query = query.whereField("aisle", isEqualTo: aisle)
+                }
+
+                switch sortBy {
+                case .name:
+                    query = query.order(by: "name")
+                case .stock:
+                    query = query.order(by: "stock")
+                }
+
+                let snapshot = try await query.getDocuments()
+                return snapshot.documents.compactMap {
+                    try? $0.data(as: Medicine.self)
+                }
         } catch {
             throw MedicineError.network(error)
         }
@@ -93,7 +122,7 @@ final class FirestoreMedicineRepository: MedicineRepository {
         do {
             let snapshot = try await db.collection("history")
                 .whereField("medicineId", isEqualTo: medicineId)
-                .order(by: "date", descending: true)
+                .order(by: "timestamp", descending: true)
                 .getDocuments()
             
             return snapshot.documents.compactMap {

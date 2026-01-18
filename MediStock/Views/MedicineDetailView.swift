@@ -1,18 +1,19 @@
 import SwiftUI
 
 struct MedicineDetailView: View {
-    @State var medicine: Medicine
     @EnvironmentObject var viewModel: MedicineStockViewModel
     @EnvironmentObject var session: SessionStore
     @State private var showDeleteAlert = false
     @Environment(\.dismiss) private var dismiss
+    @State var editedStock: Int = 0
+    @State var isEditingStock: Bool = false
+    @State var medicine: Medicine
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             // Title
             Text(medicine.name)
                 .font(.largeTitle)
-            
             // Medicine Name
             medicineNameSection
             
@@ -42,12 +43,7 @@ struct MedicineDetailView: View {
             guard let id = medicine.id else { return }
             await viewModel.loadHistory(for: id)
         }
-        .onChange(of: medicine) {
-            Task {
-                await viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
-            }
-        }
-        .alert("Souhaitez-vous supprimer ce médicament",
+        .alert("Souhaitez-vous supprimer ce médicament ?",
                isPresented: $showDeleteAlert) {
             Button("Confirmer", role: .destructive) {
                 Task {
@@ -81,35 +77,42 @@ extension MedicineDetailView {
         VStack(alignment: .leading) {
             Text("Stock")
                 .font(.headline)
-            HStack {
-                Button(action: {
-                    Task {
-                        medicine.stock -= 1
-                        await viewModel.decreaseStock(medicine, user: session.session?.uid ?? "")
+
+            HStack(spacing: 16) {
+                if isEditingStock {
+                    Picker("Stock", selection: $editedStock) {
+                        ForEach(0...500, id: \.self) { value in
+                            Text("\(value)").tag(value)
+                        }
                     }
-                }) {
-                    Image(systemName: "minus.circle")
-                        .font(.title)
-                        .foregroundColor(.red)
+                    .pickerStyle(.wheel)
+                    .frame(height: 120)
+                } else {
+                    Text("\(medicine.stock)")
+                        .font(.title2)
                 }
-                TextField("Stock", value: $medicine.stock, formatter: NumberFormatter(), onCommit: {
-                    Task {
-                        await viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                
+                Spacer()
+                
+                Button(isEditingStock ? "Valider" : "Modifier") {
+                    if isEditingStock {
+                        // Validation → envoi au ViewModel puis reload
+                        Task {
+                            let finalStock = max(0, editedStock)
+                            await viewModel.updateStock(
+                                medicine,
+                                to: finalStock,
+                                user: session.session?.uid ?? ""
+                            )
+                        }
+                    } else {
+                        // Entrée en mode édition
+                        editedStock = medicine.stock
                     }
-                })
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .keyboardType(.numberPad)
-                .frame(width: 100)
-                Button(action: {
-                    Task {
-                        medicine.stock += 1
-                        await viewModel.increaseStock(medicine, user: session.session?.uid ?? "")
-                    }
-                }) {
-                    Image(systemName: "plus.circle")
-                        .font(.title)
-                        .foregroundColor(.green)
+
+                    isEditingStock.toggle()
                 }
+                .buttonStyle(.borderedProminent)
             }
         }
     }
@@ -132,7 +135,7 @@ extension MedicineDetailView {
             Text("History")
                 .font(.headline)
                 .padding(.top, 20)
-            ForEach(viewModel.history.filter { $0.medicineId == medicine.id }, id: \.id) { entry in
+            ForEach(viewModel.history, id: \.timestamp) { entry in
                 VStack(alignment: .leading, spacing: 5) {
                     Text(entry.action)
                         .font(.headline)
@@ -144,6 +147,7 @@ extension MedicineDetailView {
                         .font(.subheadline)
                 }
                 .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
             }
@@ -151,9 +155,4 @@ extension MedicineDetailView {
     }
 }
 
-struct MedicineDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        let sampleMedicine = Medicine(name: "Sample", stock: 10, aisle: "Aisle 1")
-        MedicineDetailView(medicine: sampleMedicine).environmentObject(SessionStore())
-    }
-}
+
