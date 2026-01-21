@@ -3,36 +3,53 @@ import SwiftUI
 struct MedicineDetailView: View {
     @EnvironmentObject var viewModel: MedicineStockViewModel
     @EnvironmentObject var session: SessionStore
-    @State private var showDeleteAlert = false
     @Environment(\.dismiss) private var dismiss
-    @State var editedStock: Int = 0
-    @State var isEditingStock: Bool = false
-    @State var medicine: Medicine
-    
+
+    @State private var showDeleteAlert = false
+    @State private var editedStock: Int = 0
+    @State private var editedName: String = ""
+    @State private var editedAisle: String = ""
+    @State private var isEditingStock = false
+
+    let medicineId: String
+
+    private var medicine: Medicine? {
+        viewModel.medicines.first { $0.id == medicineId }
+    }
+
     var body: some View {
+        Group {
+            if let medicine {
+                content(medicine)
+            } else {
+                ProgressView()
+            }
+        }
+    }
+
+    private func content(_ medicine: Medicine) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            // Title
+
             Text(medicine.name)
                 .font(.largeTitle)
-            // Medicine Name
-            medicineNameSection
-            
-            // Medicine Stock
-            medicineStockSection
-            
-            // Medicine Aisle
-            medicineAisleSection
-            
-            // History Section
+
+            medicineNameSection(medicine)
+            medicineStockSection(medicine)
+            medicineAisleSection(medicine)
+
+            Text("History")
+                .font(.headline)
+
             ScrollView {
                 historySection
             }
         }
         .padding()
-        .navigationBarTitle("Medicine Details", displayMode: .inline)
+        .navigationTitle("Medicine Details")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button() {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
                     showDeleteAlert = true
                 } label: {
                     Image(systemName: "trash")
@@ -40,8 +57,7 @@ struct MedicineDetailView: View {
             }
         }
         .task {
-            guard let id = medicine.id else { return }
-            await viewModel.loadHistory(for: id)
+            await viewModel.loadHistory(for: medicineId)
         }
         .alert("Souhaitez-vous supprimer ce médicament ?",
                isPresented: $showDeleteAlert) {
@@ -51,29 +67,35 @@ struct MedicineDetailView: View {
                     dismiss()
                 }
             }
-
             Button("Annuler", role: .cancel) { }
         } message: {
-            Text("Attention cette action est définitive.")
+            Text("Attention, cette action est définitive.")
         }
     }
 }
 
 extension MedicineDetailView {
-    private var medicineNameSection: some View {
+
+    private func medicineNameSection(_ medicine: Medicine) -> some View {
         VStack(alignment: .leading) {
             Text("Name")
                 .font(.headline)
-            TextField("Name", text: $medicine.name, onCommit: {
+
+            TextField("Name", text: $editedName, onCommit: {
                 Task {
-                    await viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                    var updated = medicine
+                    updated.name = editedName
+                    await viewModel.updateMedicine(updated, user: session.session?.uid ?? "")
                 }
             })
-            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .textFieldStyle(.roundedBorder)
+            .onAppear {
+                editedName = medicine.name
+            }
         }
     }
-    
-    private var medicineStockSection: some View {
+
+    private func medicineStockSection(_ medicine: Medicine) -> some View {
         VStack(alignment: .leading) {
             Text("Stock")
                 .font(.headline)
@@ -91,12 +113,11 @@ extension MedicineDetailView {
                     Text("\(medicine.stock)")
                         .font(.title2)
                 }
-                
+
                 Spacer()
-                
+
                 Button(isEditingStock ? "Valider" : "Modifier") {
                     if isEditingStock {
-                        // Validation → envoi au ViewModel puis reload
                         Task {
                             let finalStock = max(0, editedStock)
                             await viewModel.updateStock(
@@ -106,35 +127,37 @@ extension MedicineDetailView {
                             )
                         }
                     } else {
-                        // Entrée en mode édition
                         editedStock = medicine.stock
                     }
-
                     isEditingStock.toggle()
                 }
                 .buttonStyle(.borderedProminent)
             }
         }
     }
-    
-    private var medicineAisleSection: some View {
+
+    private func medicineAisleSection(_ medicine: Medicine) -> some View {
         VStack(alignment: .leading) {
             Text("Aisle")
                 .font(.headline)
-            TextField("Aisle", text: $medicine.aisle, onCommit: {
+
+            TextField("Aisle", text: $editedAisle, onCommit: {
                 Task {
-                    await viewModel.updateMedicine(medicine, user: session.session?.uid ?? "")
+                    var updated = medicine
+                    updated.aisle = editedAisle
+                    await viewModel.updateMedicine(updated,
+                                                   user: session.session?.uid ?? "")
                 }
             })
-            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .textFieldStyle(.roundedBorder)
+            .onAppear {
+                editedAisle = medicine.aisle
+            }
         }
     }
-    
+
     private var historySection: some View {
         VStack(alignment: .leading) {
-            Text("History")
-                .font(.headline)
-                .padding(.top, 20)
             ForEach(viewModel.history, id: \.timestamp) { entry in
                 VStack(alignment: .leading, spacing: 5) {
                     Text(entry.action)
@@ -154,5 +177,3 @@ extension MedicineDetailView {
         }
     }
 }
-
-

@@ -15,6 +15,9 @@ final class MedicineStockViewModel: ObservableObject {
     @Published var aisles: [String] = []
     @Published var history: [HistoryEntry] = []
     @Published var sortOption: MedicineSortOption = .name
+    @Published var selectedAisle: String? = nil
+    @Published var searchText: String = ""
+    @Published var showOnlyInStock: Bool = false
     
     private let repository: MedicineRepository
     
@@ -62,7 +65,12 @@ final class MedicineStockViewModel: ObservableObject {
     
     func loadMedicines() async {
         do {
-            medicines = try await repository.fetchMedicines(aisle: nil, sortBy: sortOption)
+            medicines = try await repository.fetchMedicines(
+                aisle: selectedAisle,
+                searchText: searchText,
+                showOnlyInStock: showOnlyInStock,
+                sortBy: sortOption
+            )
         } catch {
             if let error = error as? LocalizedError {
                 errorMessage = error.errorDescription

@@ -10,12 +10,8 @@ import SwiftUI
 struct AddMedicineView: View {
     @EnvironmentObject var viewModel: MedicineStockViewModel
     @Environment(\.dismiss) private var dismiss
-
-    // Champs médicament
     @State private var name: String = ""
     @State private var stock: String = ""
-
-    // Gestion des allées
     @State private var selectedAisle: String = ""
     @State private var newAisle: String = ""
 
@@ -23,42 +19,50 @@ struct AddMedicineView: View {
 
     var body: some View {
         Form {
-
             // MARK: - Medicine
             Section(header: Text("Médicament")) {
                 TextField("Nom", text: $name)
-
                 TextField("Stock", text: $stock)
                     .keyboardType(.numberPad)
             }
 
             // MARK: - Aisle
             Section(header: Text("Allée")) {
-
                 Picker("Allée", selection: $selectedAisle) {
                     ForEach(viewModel.aisles, id: \.self) { aisle in
                         Text(aisle).tag(aisle)
                     }
-
                     Text("Nouvelle allée…").tag(newAisleTag)
                 }
-
                 if selectedAisle == newAisleTag {
                     TextField("Nom de la nouvelle allée", text: $newAisle)
                 }
             }
-
-            // MARK: - Action
-            Section {
-                Button("Ajouter le médicament") {
-                    addMedicine()
+        }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
                 }
+                .accessibilityLabel("Annuler")
+            }
+
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    addMedicine()
+                } label: {
+                    Image(systemName: "checkmark")
+                }
+                .buttonStyle(.borderedProminent)
                 .disabled(!isFormValid)
+                .accessibilityLabel("Ajouter le médicament")
             }
         }
         .navigationTitle("Nouveau médicament")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            // Sélection par défaut si des allées existent
             if selectedAisle.isEmpty {
                 selectedAisle = viewModel.aisles.first ?? newAisleTag
             }
