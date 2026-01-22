@@ -1,0 +1,44 @@
+{
+  "configurations" : [
+    {
+      "id" : "C939652D-B7AA-46CC-8235-CC2A77F6DF8E",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:MediStock.xcodeproj",
+      "identifier" : "53E0D8922C06084700DE1134",
+      "name" : "MediStock"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:MediStock.xcodeproj",
+        "identifier" : "53E0D8A22C06084900DE1134",
+        "name" : "MediStockTests"
+      }
+    },
+    {
+      "skippedTests" : [
+        "MediStockUITests",
+        "MediStockUITests\/testExample()",
+        "MediStockUITests\/testLaunchPerformance()",
+        "MediStockUITestsLaunchTests",
+        "MediStockUITestsLaunchTests\/testLaunch()"
+      ],
+      "target" : {
+        "containerPath" : "container:MediStock.xcodeproj",
+        "identifier" : "53E0D8AC2C06084900DE1134",
+        "name" : "MediStockUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

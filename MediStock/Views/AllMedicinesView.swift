@@ -3,11 +3,12 @@ import SwiftUI
 struct AllMedicinesView: View {
     @EnvironmentObject var viewModel: MedicineStockViewModel
     @EnvironmentObject var authSession: SessionStore
-
+    
     @State private var stockFilter: StockFilter = .all
     @State private var showAddMedicineSheet = false
     @State private var showLogoutAlert = false
-
+    @State private var isLoading: Bool = true
+    
     var body: some View {
         VStack(spacing: 12) {
             Picker("Stock filter", selection: $stockFilter) {
@@ -17,38 +18,38 @@ struct AllMedicinesView: View {
             .pickerStyle(.segmented)
             .accessibilityLabel("Filtrer les médicaments par disponibilité")
             .padding(.horizontal)
-
+            
             TextField("Filter by name", text: $viewModel.searchText)
                 .textFieldStyle(.roundedBorder)
                 .accessibilityLabel("Filtrer par nom de médicament")
                 .padding(.horizontal)
-
-            List {
-                ForEach(viewModel.medicines, id: \.id) { medicine in
-                    if let id = medicine.id {
-                        NavigationLink(destination: MedicineDetailView(medicineId: id)) {
-                            VStack(alignment: .leading) {
-                                Text(medicine.name)
-                                    .font(.headline)
-                                Text("Stock: \(medicine.stock)")
-                                    .font(.subheadline)
+            VStack {
+                Group {
+                    if isLoading {
+                        Spacer()
+                        ProgressView("Chargement des médicaments...")
+                        Spacer()
+                    } else {
+                        List {
+                            ForEach(viewModel.medicines, id: \.id) { medicine in
+                                if let id = medicine.id {
+                                    NavigationLink(destination: MedicineDetailView(medicineId: id)) {
+                                        VStack(alignment: .leading) {
+                                            Text(medicine.name)
+                                                .font(.headline)
+                                            Text("Stock: \(medicine.stock)")
+                                                .font(.subheadline)
+                                        }
+                                        .accessibilityElement(children: .ignore)
+                                        .accessibilityLabel("\(medicine.name), stock \(medicine.stock)")
+                                    }
+                                }
                             }
-                            .accessibilityElement(children: .ignore)
-                            .accessibilityLabel("\(medicine.name), stock \(medicine.stock)")
                         }
                     }
                 }
             }
-        }
-        .task {
-            await viewModel.loadMedicines()
-        }
-        .onChange(of: viewModel.searchText) {
-            Task { await viewModel.loadMedicines() }
-        }
-        .onChange(of: stockFilter) {
-            viewModel.showOnlyInStock = (stockFilter == .inStock)
-            Task { await viewModel.loadMedicines() }
+            Spacer()
         }
         .navigationTitle("All Medicines")
         .toolbar {
@@ -82,18 +83,32 @@ struct AllMedicinesView: View {
             }
             Button("Annuler", role: .cancel) { }
         }
+               .task {
+                   isLoading = true
+                   await viewModel.loadMedicines()
+                   isLoading = false
+               }
+               .onChange(of: viewModel.searchText) {
+                   Task { await viewModel.loadMedicines()
+                   }
+               }
+               .onChange(of: stockFilter) {
+                   viewModel.showOnlyInStock = (stockFilter == .inStock)
+                   Task { await viewModel.loadMedicines()
+                   }
+               }
     }
-}
-
-enum StockFilter: String, CaseIterable, Identifiable {
-    case all
-    case inStock
-
-    var id: String { rawValue }
-}
-
-struct AllMedicinesView_Previews: PreviewProvider {
-    static var previews: some View {
-        AllMedicinesView()
+    
+    enum StockFilter: String, CaseIterable, Identifiable {
+        case all
+        case inStock
+        
+        var id: String { rawValue }
+    }
+    
+    struct AllMedicinesView_Previews: PreviewProvider {
+        static var previews: some View {
+            AllMedicinesView()
+        }
     }
 }

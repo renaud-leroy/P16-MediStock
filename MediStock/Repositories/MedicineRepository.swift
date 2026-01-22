@@ -9,7 +9,7 @@ import Foundation
 import Firebase
 
 
-protocol MedicineRepository {
+protocol MedicineRepositoryProtocol {
     func addMedicine(_ medicine: Medicine) async throws
     func updateMedicine(_ medicine: Medicine, user: String) async throws
     func deleteMedicine(id: String) async throws
@@ -20,7 +20,7 @@ protocol MedicineRepository {
     func addHistory(_ history: HistoryEntry) async throws
 }
 
-final class FirestoreMedicineRepository: MedicineRepository {
+final class FirestoreMedicineRepository: MedicineRepositoryProtocol {
     
     private let db = Firestore.firestore()
     

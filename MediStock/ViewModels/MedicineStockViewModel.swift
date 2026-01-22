@@ -19,9 +19,9 @@ final class MedicineStockViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var showOnlyInStock: Bool = false
     
-    private let repository: MedicineRepository
+    private let repository: MedicineRepositoryProtocol
     
-    init(repository: MedicineRepository) {
+    init(repository: MedicineRepositoryProtocol) {
         self.repository = repository
     }
     
@@ -29,7 +29,11 @@ final class MedicineStockViewModel: ObservableObject {
         do {
             aisles = try await repository.fetchAisles()
         } catch {
-            // gestion erreur à remplir
+            if let error = error as? LocalizedError {
+                errorMessage = error.errorDescription
+            } else {
+                errorMessage = "Une erreur est survenue lors du chargement des rayons."
+            }
         }
     }
 

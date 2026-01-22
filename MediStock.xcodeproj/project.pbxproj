@@ -11,7 +11,6 @@
 		53E0D8992C06084700DE1134 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E0D8982C06084700DE1134 /* ContentView.swift */; };
 		53E0D89B2C06084900DE1134 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53E0D89A2C06084900DE1134 /* Assets.xcassets */; };
 		53E0D89E2C06084900DE1134 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53E0D89D2C06084900DE1134 /* Preview Assets.xcassets */; };
-		53E0D8A82C06084900DE1134 /* MediStockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E0D8A72C06084900DE1134 /* MediStockTests.swift */; };
 		53E0D8B22C06084900DE1134 /* MediStockUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E0D8B12C06084900DE1134 /* MediStockUITests.swift */; };
 		53E0D8B42C06084900DE1134 /* MediStockUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E0D8B32C06084900DE1134 /* MediStockUITestsLaunchTests.swift */; };
 		53E0D8C22C06092E00DE1134 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 53E0D8C12C06092E00DE1134 /* FirebaseAnalytics */; };
@@ -26,6 +25,7 @@
 		53E0D8D42C06092E00DE1134 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 53E0D8D32C06092E00DE1134 /* FirebaseFirestoreCombine-Community */; };
 		53E0D8D62C06092E00DE1134 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 53E0D8D52C06092E00DE1134 /* FirebaseFirestoreSwift */; };
 		53E0D8E22C065FFE00DE1134 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E0D8E12C065FFE00DE1134 /* AppDelegate.swift */; };
+		9A80F6A22F228B400094543F /* MedicineStockViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A80F6A12F228B400094543F /* MedicineStockViewModelTests.swift */; };
 		9ADAE02F2F16B3BD0012E51E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9ADAE02E2F16B3BD0012E51E /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -53,15 +53,17 @@
 		53E0D89A2C06084900DE1134 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		53E0D89D2C06084900DE1134 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		53E0D8A32C06084900DE1134 /* MediStockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MediStockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		53E0D8A72C06084900DE1134 /* MediStockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediStockTests.swift; sourceTree = "<group>"; };
 		53E0D8AD2C06084900DE1134 /* MediStockUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MediStockUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		53E0D8B12C06084900DE1134 /* MediStockUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediStockUITests.swift; sourceTree = "<group>"; };
 		53E0D8B32C06084900DE1134 /* MediStockUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediStockUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		53E0D8E12C065FFE00DE1134 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		9A80F6A12F228B400094543F /* MedicineStockViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicineStockViewModelTests.swift; sourceTree = "<group>"; };
+		9A80F6A32F2299F70094543F /* MediStock.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MediStock.xctestplan; sourceTree = SOURCE_ROOT; };
 		9ADAE02E2F16B3BD0012E51E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		9A80F69E2F2286A00094543F /* Mocks */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Mocks; sourceTree = "<group>"; };
 		9ADAE0302F1870670012E51E /* Models */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Models; sourceTree = "<group>"; };
 		9ADAE0312F1871530012E51E /* ViewModels */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ViewModels; sourceTree = "<group>"; };
 		9ADAE0322F1871660012E51E /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
@@ -154,7 +156,9 @@
 		53E0D8A62C06084900DE1134 /* MediStockTests */ = {
 			isa = PBXGroup;
 			children = (
-				53E0D8A72C06084900DE1134 /* MediStockTests.swift */,
+				9A80F69E2F2286A00094543F /* Mocks */,
+				9A80F6A12F228B400094543F /* MedicineStockViewModelTests.swift */,
+				9A80F6A32F2299F70094543F /* MediStock.xctestplan */,
 			);
 			path = MediStockTests;
 			sourceTree = "<group>";
@@ -220,6 +224,9 @@
 			);
 			dependencies = (
 				53E0D8A52C06084900DE1134 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9A80F69E2F2286A00094543F /* Mocks */,
 			);
 			name = MediStockTests;
 			productName = MediStockTests;
@@ -332,7 +339,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53E0D8A82C06084900DE1134 /* MediStockTests.swift in Sources */,
+				9A80F6A22F228B400094543F /* MedicineStockViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,10 +554,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HZAZV43ASV;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rebonnte.MediStockTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.renaudleroy.MediStockTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -566,10 +574,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HZAZV43ASV;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rebonnte.MediStockTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.renaudleroy.MediStockTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -582,8 +591,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HZAZV43ASV;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rebonnte.MediStockUITests;
@@ -599,8 +610,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HZAZV43ASV;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rebonnte.MediStockUITests;
