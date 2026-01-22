@@ -10,6 +10,7 @@ struct MedicineDetailView: View {
     @State private var editedName: String = ""
     @State private var editedAisle: String = ""
     @State private var isEditingStock = false
+    @State private var isEditing = false
 
     let medicineId: String
 
@@ -48,7 +49,34 @@ struct MedicineDetailView: View {
         .navigationTitle("Medicine Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isEditing.toggle()
+                    isEditingStock = false
+                    if !isEditing {
+                        Task {
+                            var updated = medicine
+                            updated.name = editedName
+                            updated.aisle = editedAisle
+
+                            await viewModel.updateMedicine(
+                                updated,
+                                user: session.session?.uid ?? ""
+                            )
+
+                            let finalStock = max(0, editedStock)
+                            await viewModel.updateStock(
+                                updated,
+                                to: finalStock,
+                                user: session.session?.uid ?? ""
+                            )
+                        }
+                    }
+                } label: {
+                    Image(systemName: isEditing ? "checkmark.circle.fill" : "pencil")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showDeleteAlert = true
                 } label: {
@@ -81,27 +109,23 @@ extension MedicineDetailView {
             Text("Name")
                 .font(.headline)
 
-            TextField("Name", text: $editedName, onCommit: {
-                Task {
-                    var updated = medicine
-                    updated.name = editedName
-                    await viewModel.updateMedicine(updated, user: session.session?.uid ?? "")
-                }
-            })
+            TextField("Name", text: $editedName)
             .textFieldStyle(.roundedBorder)
             .onAppear {
                 editedName = medicine.name
             }
+            .disabled(!isEditing)
+            .opacity(isEditing ? 1 : 0.6)
         }
     }
 
     private func medicineStockSection(_ medicine: Medicine) -> some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Stock")
                 .font(.headline)
 
             HStack(spacing: 16) {
-                if isEditingStock {
+                if isEditing {
                     Picker("Stock", selection: $editedStock) {
                         ForEach(0...500, id: \.self) { value in
                             Text("\(value)").tag(value)
@@ -109,29 +133,14 @@ extension MedicineDetailView {
                     }
                     .pickerStyle(.wheel)
                     .frame(height: 120)
+                    .onAppear {
+                        editedStock = medicine.stock
+                    }
                 } else {
                     Text("\(medicine.stock)")
                         .font(.title2)
                 }
-
                 Spacer()
-
-                Button(isEditingStock ? "Valider" : "Modifier") {
-                    if isEditingStock {
-                        Task {
-                            let finalStock = max(0, editedStock)
-                            await viewModel.updateStock(
-                                medicine,
-                                to: finalStock,
-                                user: session.session?.uid ?? ""
-                            )
-                        }
-                    } else {
-                        editedStock = medicine.stock
-                    }
-                    isEditingStock.toggle()
-                }
-                .buttonStyle(.borderedProminent)
             }
         }
     }
@@ -153,6 +162,8 @@ extension MedicineDetailView {
             .onAppear {
                 editedAisle = medicine.aisle
             }
+            .disabled(!isEditing)
+            .opacity(isEditing ? 1 : 0.6)
         }
     }
 

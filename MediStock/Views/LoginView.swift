@@ -6,22 +6,23 @@ struct LoginView: View {
     @EnvironmentObject var session: SessionStore
 
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             TextField("Email", text: $email)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             SecureField("Password", text: $password)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-            Button(action: {
-                session.signIn(email: email, password: password)
-            }) {
-                Text("Login")
-            }
-            Button(action: {
-                session.signUp(email: email, password: password)
-            }) {
-                Text("Sign Up")
+            VStack(spacing: 20) {
+                Button("Login") {
+                    session.signIn(email: email, password: password)
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.automatic)
+                Button("SignUp") {
+                    session.signUp(email: email, password: password)
+                }
+                .buttonStyle(.borderedProminent)
             }
         }
         .padding()
