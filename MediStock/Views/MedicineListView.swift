@@ -16,6 +16,9 @@ struct MedicineListView: View {
                             Text("Stock: \(medicine.stock)")
                                 .font(.subheadline)
                         }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("\(medicine.name), stock \(medicine.stock)")
+                        .accessibilityHint("Afficher les détails du médicament")
                     }
                 }
             }

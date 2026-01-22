@@ -10,6 +10,8 @@ struct AisleListView: View {
             ForEach(viewModel.aisles, id: \.self) { aisle in
                 NavigationLink(destination: MedicineListView(aisle: aisle)) {
                     Text(aisle)
+                        .accessibilityLabel("\(aisle)")
+                        .accessibilityHint("Afficher les médicaments de ce rayon")
                 }
             }
         }

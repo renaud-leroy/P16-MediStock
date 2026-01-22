@@ -15,10 +15,12 @@ struct AllMedicinesView: View {
                 Text("In stock").tag(StockFilter.inStock)
             }
             .pickerStyle(.segmented)
+            .accessibilityLabel("Filtrer les médicaments par disponibilité")
             .padding(.horizontal)
 
             TextField("Filter by name", text: $viewModel.searchText)
                 .textFieldStyle(.roundedBorder)
+                .accessibilityLabel("Filtrer par nom de médicament")
                 .padding(.horizontal)
 
             List {
@@ -31,6 +33,8 @@ struct AllMedicinesView: View {
                                 Text("Stock: \(medicine.stock)")
                                     .font(.subheadline)
                             }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("\(medicine.name), stock \(medicine.stock)")
                         }
                     }
                 }
@@ -53,6 +57,7 @@ struct AllMedicinesView: View {
                     showAddMedicineSheet = true
                 } label: {
                     Image(systemName: "plus")
+                        .accessibilityLabel("Ajouter un médicament")
                 }
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
@@ -61,6 +66,7 @@ struct AllMedicinesView: View {
                     showLogoutAlert = true
                 } label: {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .accessibilityLabel("Se déconnecter")
                 }
             }
         }

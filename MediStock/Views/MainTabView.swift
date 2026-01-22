@@ -9,6 +9,8 @@ struct MainTabView: View {
             .tabItem {
                 Image(systemName: "list.dash")
                 Text("Aisles")
+                    .accessibilityLabel("Rayons")
+                    .accessibilityHint("Afficher la liste des rayons")
                 
             }
             NavigationStack {
@@ -17,6 +19,8 @@ struct MainTabView: View {
             .tabItem {
                 Image(systemName: "square.grid.2x2")
                 Text("All Medicines")
+                    .accessibilityLabel("Tous les médicaments")
+                    .accessibilityHint("Afficher tous les médicaments")
                 
             }
         }

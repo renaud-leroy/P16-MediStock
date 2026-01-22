@@ -22,8 +22,11 @@ struct AddMedicineView: View {
             // MARK: - Medicine
             Section(header: Text("Médicament")) {
                 TextField("Nom", text: $name)
+                    .accessibilityLabel("Nom du médicament")
                 TextField("Stock", text: $stock)
                     .keyboardType(.numberPad)
+                    .accessibilityLabel("Quantité en stock")
+                    .accessibilityHint("Saisir un nombre")
             }
 
             // MARK: - Aisle
@@ -34,8 +37,10 @@ struct AddMedicineView: View {
                     }
                     Text("Nouvelle allée…").tag(newAisleTag)
                 }
+                .accessibilityLabel("Choisir une allée")
                 if selectedAisle == newAisleTag {
                     TextField("Nom de la nouvelle allée", text: $newAisle)
+                        .accessibilityLabel("Nom de la nouvelle allée")
                 }
             }
         }

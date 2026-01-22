@@ -269,11 +269,11 @@
 			};
 			buildConfigurationList = 53E0D88E2C06084700DE1134 /* Build configuration list for PBXProject "MediStock" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = fr;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				fr,
 			);
 			mainGroup = 53E0D88A2C06084700DE1134;
 			packageReferences = (

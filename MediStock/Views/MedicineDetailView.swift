@@ -24,6 +24,7 @@ struct MedicineDetailView: View {
                 content(medicine)
             } else {
                 ProgressView()
+                .accessibilityLabel("Chargement du médicament")
             }
         }
     }
@@ -74,6 +75,7 @@ struct MedicineDetailView: View {
                     }
                 } label: {
                     Image(systemName: isEditing ? "checkmark.circle.fill" : "pencil")
+                    .accessibilityLabel(isEditing ? "Valider les modifications" : "Modifier le médicament")
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -81,6 +83,7 @@ struct MedicineDetailView: View {
                     showDeleteAlert = true
                 } label: {
                     Image(systemName: "trash")
+                    .accessibilityLabel("Supprimer le médicament")
                 }
             }
         }
@@ -116,11 +119,12 @@ extension MedicineDetailView {
             }
             .disabled(!isEditing)
             .opacity(isEditing ? 1 : 0.6)
+            .accessibilityLabel("Nom du médicament")
         }
     }
 
     private func medicineStockSection(_ medicine: Medicine) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 10 ) {
             Text("Stock")
                 .font(.headline)
 
@@ -136,9 +140,11 @@ extension MedicineDetailView {
                     .onAppear {
                         editedStock = medicine.stock
                     }
+                    .accessibilityLabel("Modifier la quantité en stock")
                 } else {
                     Text("\(medicine.stock)")
                         .font(.title2)
+                        .accessibilityLabel("Stock actuel \(medicine.stock)")
                 }
                 Spacer()
             }
@@ -164,6 +170,7 @@ extension MedicineDetailView {
             }
             .disabled(!isEditing)
             .opacity(isEditing ? 1 : 0.6)
+            .accessibilityLabel("Rayon du médicament")
         }
     }
 
@@ -184,6 +191,7 @@ extension MedicineDetailView {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
+                .accessibilityElement(children: .combine)
             }
         }
     }
