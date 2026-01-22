@@ -61,7 +61,6 @@ struct AllMedicinesView: View {
                         .accessibilityLabel("Ajouter un médicament")
                 }
             }
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showLogoutAlert = true
