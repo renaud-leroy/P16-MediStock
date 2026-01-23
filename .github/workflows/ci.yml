@@ -14,15 +14,23 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Select Xcode version
-      uses: maxim-lobanov/setup-xcode@v1
+    - name: Clean DerivedData
+      run: rm -rf ~/Library/Developer/Xcode/DerivedData
+
+    - name: Cache SwiftPM
+      uses: actions/cache@v4
       with:
-        xcode-version: latest-stable
+        path: |
+          ~/Library/Developer/Xcode/DerivedData
+          ~/Library/Caches/org.swift.swiftpm
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
 
     - name: Build and run tests
       run: |
         xcodebuild test \
         -project MediStock.xcodeproj \
         -scheme MediStock \
-        -destination 'generic/platform=iOS' \
+        -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
         CODE_SIGNING_ALLOWED=NO

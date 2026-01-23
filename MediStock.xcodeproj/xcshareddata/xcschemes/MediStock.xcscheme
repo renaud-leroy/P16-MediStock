@@ -34,47 +34,6 @@
             default = "YES">
          </TestPlanReference>
       </TestPlans>
-      <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "53E0D8A22C06084900DE1134"
-               BuildableName = "MediStockTests.xctest"
-               BlueprintName = "MediStockTests"
-               ReferencedContainer = "container:MediStock.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "53E0D8AC2C06084900DE1134"
-               BuildableName = "MediStockUITests.xctest"
-               BlueprintName = "MediStockUITests"
-               ReferencedContainer = "container:MediStock.xcodeproj">
-            </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "MediStockUITests">
-               </Test>
-               <Test
-                  Identifier = "MediStockUITests/testExample()">
-               </Test>
-               <Test
-                  Identifier = "MediStockUITests/testLaunchPerformance()">
-               </Test>
-               <Test
-                  Identifier = "MediStockUITestsLaunchTests">
-               </Test>
-               <Test
-                  Identifier = "MediStockUITestsLaunchTests/testLaunch()">
-               </Test>
-            </SkippedTests>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

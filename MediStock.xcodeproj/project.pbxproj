@@ -58,6 +58,7 @@
 		53E0D8B32C06084900DE1134 /* MediStockUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediStockUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		53E0D8E12C065FFE00DE1134 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9A80F6A12F228B400094543F /* MedicineStockViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicineStockViewModelTests.swift; sourceTree = "<group>"; };
+		9A80F7BB2F22F5770094543F /* MediStock.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MediStock.xctestplan; sourceTree = "<group>"; };
 		9ADAE02E2F16B3BD0012E51E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -109,6 +110,7 @@
 		53E0D88A2C06084700DE1134 = {
 			isa = PBXGroup;
 			children = (
+				9A80F7BB2F22F5770094543F /* MediStock.xctestplan */,
 				53E0D8952C06084700DE1134 /* MediStock */,
 				53E0D8A62C06084900DE1134 /* MediStockTests */,
 				53E0D8B02C06084900DE1134 /* MediStockUITests */,
@@ -496,6 +498,7 @@
 				DEVELOPMENT_TEAM = HZAZV43ASV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MediStock/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -526,6 +529,7 @@
 				DEVELOPMENT_TEAM = HZAZV43ASV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MediStock/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
