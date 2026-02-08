@@ -3,14 +3,15 @@ import SwiftUI
 struct AllMedicinesView: View {
     @EnvironmentObject var viewModel: MedicineStockViewModel
     @EnvironmentObject var authSession: SessionStore
-    
+
     @State private var stockFilter: StockFilter = .all
     @State private var showAddMedicineSheet = false
     @State private var showLogoutAlert = false
     @State private var isLoading: Bool = true
-    
+
     var body: some View {
         VStack(spacing: 12) {
+            // MARK: - Filters
             Picker("Stock filter", selection: $stockFilter) {
                 Text("All").tag(StockFilter.all)
                 Text("In stock").tag(StockFilter.inStock)
@@ -18,11 +19,13 @@ struct AllMedicinesView: View {
             .pickerStyle(.segmented)
             .accessibilityLabel("Filtrer les médicaments par disponibilité")
             .padding(.horizontal)
-            
+
             TextField("Filter by name", text: $viewModel.searchText)
                 .textFieldStyle(.roundedBorder)
                 .accessibilityLabel("Filtrer par nom de médicament")
                 .padding(.horizontal)
+
+            // MARK: - List
             VStack {
                 Group {
                     if isLoading {
@@ -82,29 +85,31 @@ struct AllMedicinesView: View {
             }
             Button("Annuler", role: .cancel) { }
         }
-               .task {
-                   isLoading = true
-                   await viewModel.loadMedicines()
-                   isLoading = false
-               }
-               .onChange(of: viewModel.searchText) {
-                   Task { await viewModel.loadMedicines()
-                   }
-               }
-               .onChange(of: stockFilter) {
-                   viewModel.showOnlyInStock = (stockFilter == .inStock)
-                   Task { await viewModel.loadMedicines()
-                   }
-               }
+        // MARK: - Data loading
+        .task {
+            isLoading = true
+            await viewModel.loadMedicines()
+            isLoading = false
+        }
+        .task(id: viewModel.searchText) {
+            try? await Task.sleep(for: .milliseconds(300))
+            await viewModel.loadMedicines()
+        }
+        .onChange(of: stockFilter) {
+            viewModel.showOnlyInStock = (stockFilter == .inStock)
+            Task { await viewModel.loadMedicines() }
+        }
     }
-    
+
+    // MARK: - StockFilter
+
     enum StockFilter: String, CaseIterable, Identifiable {
         case all
         case inStock
-        
+
         var id: String { rawValue }
     }
-    
+
     struct AllMedicinesView_Previews: PreviewProvider {
         static var previews: some View {
             AllMedicinesView()

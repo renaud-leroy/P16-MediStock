@@ -20,11 +20,15 @@ final class MedicineStockViewModel: ObservableObject {
     @Published var showOnlyInStock: Bool = false
     
     private let repository: MedicineRepositoryProtocol
-    
+
+    // MARK: - Init
+
     init(repository: MedicineRepositoryProtocol) {
         self.repository = repository
     }
-    
+
+    // MARK: - Data Loading
+
     func loadAisles() async {
         do {
             aisles = try await repository.fetchAisles()
@@ -36,6 +40,8 @@ final class MedicineStockViewModel: ObservableObject {
             }
         }
     }
+
+    // MARK: - CRUD Operations
 
     func updateStock(_ medicine: Medicine, to newStock: Int, user: String) async {
         guard let id = medicine.id else { return }
@@ -128,8 +134,25 @@ final class MedicineStockViewModel: ObservableObject {
             if let error = error as? LocalizedError {
                 errorMessage = error.errorDescription
             } else {
-                errorMessage = "Une erreur est survenue lors du chargement de l’historique."
+                errorMessage = "Une erreur est survenue lors du chargement de l'historique."
             }
         }
+    }
+
+    // MARK: - Business Logic
+
+    func medicinesForAisle(_ aisle: String) -> [Medicine] {
+        medicines.filter { $0.aisle == aisle }
+    }
+
+    func saveChanges(for medicine: Medicine, name: String, aisle: String, stock: Int, user: String) async {
+        var updated = medicine
+        updated.name = name
+        updated.aisle = aisle
+
+        await updateMedicine(updated, user: user)
+
+        let finalStock = max(0, stock)
+        await updateStock(updated, to: finalStock, user: user)
     }
 }

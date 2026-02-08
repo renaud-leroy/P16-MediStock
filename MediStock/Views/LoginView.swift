@@ -7,6 +7,17 @@ struct LoginView: View {
 
     var body: some View {
         VStack(spacing: 20) {
+            // MARK: - Error display
+            if let error = session.authError {
+                Text(error)
+                    .foregroundColor(.red)
+                    .font(.callout)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                    .accessibilityLabel("Erreur d'authentification : \(error)")
+            }
+
+            // MARK: - Fields
             TextField("Email", text: $email)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
@@ -21,15 +32,21 @@ struct LoginView: View {
                 .accessibilityLabel("Mot de passe")
                 .accessibilityHint("Saisir votre mot de passe")
                 .textContentType(.password)
+
+            // MARK: - Buttons
             VStack(spacing: 20) {
                 Button("Login") {
-                    session.signIn(email: email, password: password)
+                    Task {
+                        await session.signIn(email: email, password: password)
+                    }
                 }
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.automatic)
                 .accessibilityLabel("Se connecter")
                 Button("SignUp") {
-                    session.signUp(email: email, password: password)
+                    Task {
+                        await session.signUp(email: email, password: password)
+                    }
                 }
                 .buttonStyle(.borderedProminent)
                 .accessibilityLabel("Créer un compte")
@@ -44,3 +61,4 @@ struct LoginView_Previews: PreviewProvider {
         LoginView().environmentObject(SessionStore())
     }
 }
+

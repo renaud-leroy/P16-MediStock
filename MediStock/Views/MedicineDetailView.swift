@@ -29,6 +29,8 @@ struct MedicineDetailView: View {
         }
     }
 
+    // MARK: - Content
+
     private func content(_ medicine: Medicine) -> some View {
         VStack(alignment: .leading, spacing: 20) {
 
@@ -55,21 +57,14 @@ struct MedicineDetailView: View {
                     isEditing.toggle()
                     isEditingStock = false
                     if !isEditing {
+                        guard let userId = session.session?.uid else { return }
                         Task {
-                            var updated = medicine
-                            updated.name = editedName
-                            updated.aisle = editedAisle
-
-                            await viewModel.updateMedicine(
-                                updated,
-                                user: session.session?.uid ?? ""
-                            )
-
-                            let finalStock = max(0, editedStock)
-                            await viewModel.updateStock(
-                                updated,
-                                to: finalStock,
-                                user: session.session?.uid ?? ""
+                            await viewModel.saveChanges(
+                                for: medicine,
+                                name: editedName,
+                                aisle: editedAisle,
+                                stock: editedStock,
+                                user: userId
                             )
                         }
                     }
@@ -105,6 +100,8 @@ struct MedicineDetailView: View {
     }
 }
 
+// MARK: - Sections
+
 extension MedicineDetailView {
 
     private func medicineNameSection(_ medicine: Medicine) -> some View {
@@ -130,17 +127,13 @@ extension MedicineDetailView {
 
             HStack(spacing: 16) {
                 if isEditing {
-                    Picker("Stock", selection: $editedStock) {
-                        ForEach(0...500, id: \.self) { value in
-                            Text("\(value)").tag(value)
+                    TextField("Stock", value: $editedStock, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.numberPad)
+                        .onAppear {
+                            editedStock = medicine.stock
                         }
-                    }
-                    .pickerStyle(.wheel)
-                    .frame(height: 120)
-                    .onAppear {
-                        editedStock = medicine.stock
-                    }
-                    .accessibilityLabel("Modifier la quantité en stock")
+                        .accessibilityLabel("Modifier la quantité en stock")
                 } else {
                     Text("\(medicine.stock)")
                         .font(.title2)
@@ -156,14 +149,7 @@ extension MedicineDetailView {
             Text("Aisle")
                 .font(.headline)
 
-            TextField("Aisle", text: $editedAisle, onCommit: {
-                Task {
-                    var updated = medicine
-                    updated.aisle = editedAisle
-                    await viewModel.updateMedicine(updated,
-                                                   user: session.session?.uid ?? "")
-                }
-            })
+            TextField("Aisle", text: $editedAisle)
             .textFieldStyle(.roundedBorder)
             .onAppear {
                 editedAisle = medicine.aisle
@@ -173,6 +159,8 @@ extension MedicineDetailView {
             .accessibilityLabel("Rayon du médicament")
         }
     }
+
+    // MARK: - History
 
     private var historySection: some View {
         VStack(alignment: .leading) {
@@ -196,3 +184,4 @@ extension MedicineDetailView {
         }
     }
 }
+

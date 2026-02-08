@@ -1,50 +1,82 @@
 import Foundation
 import Firebase
 
-class SessionStore: ObservableObject {
+// MARK: - Protocol
+
+@MainActor
+protocol SessionStoreProtocol: ObservableObject {
+    var session: User? { get }
+    var authError: String? { get }
+    func listen()
+    func signUp(email: String, password: String) async
+    func signIn(email: String, password: String) async
+    func signOut()
+    func unbind()
+}
+
+// MARK: - SessionStore
+
+@MainActor
+final class SessionStore: ObservableObject, SessionStoreProtocol {
     @Published var session: User?
-    var handle: AuthStateDidChangeListenerHandle?
+    @Published var authError: String?
+
+    private var handle: AuthStateDidChangeListenerHandle?
+
+    // MARK: - Listener
 
     func listen() {
-        handle = Auth.auth().addStateDidChangeListener { (auth, user) in
-            if let user = user {
-                self.session = User(uid: user.uid, email: user.email)
-            } else {
-                self.session = nil
+        handle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            Task { @MainActor in
+                if let user = user {
+                    self?.session = User(uid: user.uid, email: user.email)
+                } else {
+                    self?.session = nil
+                }
             }
         }
     }
 
-    func signUp(email: String, password: String) {
-        Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
-            if let error = error {
-                print("Error creating user: \(error.localizedDescription) \(error)")
-            } else {
-                self.session = User(uid: result?.user.uid ?? "", email: result?.user.email ?? "")
-            }
+    // MARK: - Authentication
+
+    func signUp(email: String, password: String) async {
+        authError = nil
+        do {
+            let result = try await Auth.auth().createUser(withEmail: email, password: password)
+            session = User(uid: result.user.uid, email: result.user.email)
+        } catch {
+            authError = error.localizedDescription
         }
     }
 
-    func signIn(email: String, password: String) {
-        Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
-            if let error = error {
-                print("Error signing in: \(error.localizedDescription)")
-            } else {
-                self.session = User(uid: result?.user.uid ?? "", email: result?.user.email ?? "")
-            }
+    func signIn(email: String, password: String) async {
+        authError = nil
+        do {
+            let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            session = User(uid: result.user.uid, email: result.user.email)
+        } catch {
+            authError = error.localizedDescription
         }
     }
 
     func signOut() {
         do {
             try Auth.auth().signOut()
-            self.session = nil
-        } catch let error {
-            print("Error signing out: \(error.localizedDescription)")
+            session = nil
+        } catch {
+            authError = error.localizedDescription
         }
     }
 
+    // MARK: - Cleanup
+
     func unbind() {
+        if let handle = handle {
+            Auth.auth().removeStateDidChangeListener(handle)
+        }
+    }
+
+    deinit {
         if let handle = handle {
             Auth.auth().removeStateDidChangeListener(handle)
         }

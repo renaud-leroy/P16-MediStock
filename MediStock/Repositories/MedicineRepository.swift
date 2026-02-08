@@ -9,6 +9,8 @@ import Foundation
 import Firebase
 
 
+// MARK: - Protocol
+
 protocol MedicineRepositoryProtocol {
     func addMedicine(_ medicine: Medicine) async throws
     func updateMedicine(_ medicine: Medicine, user: String) async throws
@@ -20,9 +22,13 @@ protocol MedicineRepositoryProtocol {
     func addHistory(_ history: HistoryEntry) async throws
 }
 
+// MARK: - Firestore Implementation
+
 final class FirestoreMedicineRepository: MedicineRepositoryProtocol {
     
     private let db = Firestore.firestore()
+    
+    // MARK: - CRUD
     
     func addMedicine(_ medicine: Medicine) async throws {
         do {
@@ -74,6 +80,8 @@ final class FirestoreMedicineRepository: MedicineRepositoryProtocol {
         }
     }
     
+    // MARK: - Queries
+    
     func fetchMedicines(aisle: String?, searchText: String?, showOnlyInStock: Bool, sortBy: MedicineSortOption) async throws -> [Medicine] {
         do {
             var query: Query = db.collection("medicines")
@@ -100,8 +108,13 @@ final class FirestoreMedicineRepository: MedicineRepositoryProtocol {
             }
             
             let snapshot = try await query.getDocuments()
-            return snapshot.documents.compactMap {
-                try? $0.data(as: Medicine.self)
+            return snapshot.documents.compactMap { doc in
+                do {
+                    return try doc.data(as: Medicine.self)
+                } catch {
+                    print("Decoding error for document \(doc.documentID): \(error)")
+                    return nil
+                }
             }
         } catch {
             throw MedicineError.network(error)
@@ -128,6 +141,8 @@ final class FirestoreMedicineRepository: MedicineRepositoryProtocol {
         }
     }
     
+    // MARK: - History
+    
     func fetchHistory(medicineId: String) async throws -> [HistoryEntry] {
         do {
             let snapshot = try await db.collection("history")
@@ -135,8 +150,13 @@ final class FirestoreMedicineRepository: MedicineRepositoryProtocol {
                 .order(by: "timestamp", descending: true)
                 .getDocuments()
             
-            return snapshot.documents.compactMap {
-                try? $0.data(as: HistoryEntry.self)
+            return snapshot.documents.compactMap { doc in
+                do {
+                    return try doc.data(as: HistoryEntry.self)
+                } catch {
+                    print("Decoding error for history \(doc.documentID): \(error)")
+                    return nil
+                }
             }
         } catch {
             throw MedicineError.network(error)

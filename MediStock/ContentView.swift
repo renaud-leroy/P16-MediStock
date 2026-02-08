@@ -15,6 +15,9 @@ struct ContentView: View {
         .onAppear {
             session.listen()
         }
+        .onDisappear {
+            session.unbind()
+        }
     }
 }
 
