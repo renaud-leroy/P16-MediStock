@@ -51,9 +51,10 @@ struct AddMedicineView: View {
                 } label: {
                     Image(systemName: "xmark")
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(.secondary)
                 .accessibilityLabel("Annuler")
             }
-
             ToolbarItem(placement: .confirmationAction) {
                 Button {
                     addMedicine()
@@ -61,6 +62,7 @@ struct AddMedicineView: View {
                     Image(systemName: "checkmark")
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(isFormValid ? .blue : .gray)
                 .disabled(!isFormValid)
                 .accessibilityLabel("Ajouter le médicament")
             }

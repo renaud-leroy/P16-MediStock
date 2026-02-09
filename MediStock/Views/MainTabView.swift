@@ -7,23 +7,22 @@ struct MainTabView: View {
                 AisleListView()
             }
             .tabItem {
-                Image(systemName: "list.dash")
+                Image(systemName: "square.stack")
                 Text("Aisles")
                     .accessibilityLabel("Rayons")
                     .accessibilityHint("Afficher la liste des rayons")
-                
             }
             NavigationStack {
                 AllMedicinesView()
             }
             .tabItem {
-                Image(systemName: "square.grid.2x2")
+                Image(systemName: "pills")
                 Text("All Medicines")
                     .accessibilityLabel("Tous les médicaments")
                     .accessibilityHint("Afficher tous les médicaments")
-                
             }
         }
+        .tint(.pink)
     }
 }
 

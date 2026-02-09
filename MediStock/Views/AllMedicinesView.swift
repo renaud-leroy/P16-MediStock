@@ -21,7 +21,15 @@ struct AllMedicinesView: View {
             .padding(.horizontal)
 
             TextField("Filter by name", text: $viewModel.searchText)
-                .textFieldStyle(.roundedBorder)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.primary.opacity(0.25), lineWidth: 1)
+                )
                 .accessibilityLabel("Filtrer par nom de médicament")
                 .padding(.horizontal)
 
@@ -73,10 +81,12 @@ struct AllMedicinesView: View {
                 }
             }
         }
+        .tint(.primary)
         .sheet(isPresented: $showAddMedicineSheet) {
             NavigationStack {
                 AddMedicineView()
             }
+            .tint(.primary)
         }
         .alert("Souhaitez-vous vous déconnecter ?",
                isPresented: $showLogoutAlert) {
