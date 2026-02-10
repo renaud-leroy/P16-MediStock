@@ -11,7 +11,6 @@ struct AllMedicinesView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            // MARK: - Filters
             Picker("Stock filter", selection: $stockFilter) {
                 Text("All").tag(StockFilter.all)
                 Text("In stock").tag(StockFilter.inStock)
@@ -38,7 +37,7 @@ struct AllMedicinesView: View {
                 Group {
                     if isLoading {
                         Spacer()
-                        ProgressView("Chargement des médicaments...")
+                        ProgressView("Medicine loading...")
                         Spacer()
                     } else {
                         List {
@@ -118,11 +117,5 @@ struct AllMedicinesView: View {
         case inStock
 
         var id: String { rawValue }
-    }
-
-    struct AllMedicinesView_Previews: PreviewProvider {
-        static var previews: some View {
-            AllMedicinesView()
-        }
     }
 }

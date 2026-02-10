@@ -11,7 +11,9 @@ enum MedicineError: LocalizedError {
     case missingId
     case network(Error)
     case unknown
-
+    
+    // MARK: - LocalizedError
+    
     var errorDescription: String? {
         switch self {
         case .missingId:

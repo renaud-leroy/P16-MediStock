@@ -16,7 +16,6 @@ protocol SessionStoreProtocol: ObservableObject {
 
 // MARK: - SessionStore
 
-@MainActor
 final class SessionStore: ObservableObject, SessionStoreProtocol {
     @Published var session: User?
     @Published var authError: String?

@@ -7,19 +7,22 @@
 
 import SwiftUI
 
+enum AisleSelection: Hashable {
+    case existing(String)
+    case new
+}
+
 struct AddMedicineView: View {
     @EnvironmentObject var viewModel: MedicineStockViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var name: String = ""
     @State private var stock: String = ""
-    @State private var selectedAisle: String = ""
+    @State private var selectedAisle: AisleSelection = .new
     @State private var newAisle: String = ""
 
-    private let newAisleTag = "__NEW_AISLE__"
 
     var body: some View {
         Form {
-            // MARK: - Medicine
             Section(header: Text("Médicament")) {
                 TextField("Nom", text: $name)
                     .accessibilityLabel("Nom du médicament")
@@ -29,16 +32,17 @@ struct AddMedicineView: View {
                     .accessibilityHint("Saisir un nombre")
             }
 
-            // MARK: - Aisle
             Section(header: Text("Allée")) {
                 Picker("Allée", selection: $selectedAisle) {
                     ForEach(viewModel.aisles, id: \.self) { aisle in
-                        Text(aisle).tag(aisle)
+                        Text(aisle)
+                            .tag(AisleSelection.existing(aisle))
                     }
-                    Text("Nouvelle allée…").tag(newAisleTag)
+                    Text("Nouvelle allée…")
+                        .tag(AisleSelection.new)
                 }
                 .accessibilityLabel("Choisir une allée")
-                if selectedAisle == newAisleTag {
+                if case .new = selectedAisle {
                     TextField("Nom de la nouvelle allée", text: $newAisle)
                         .accessibilityLabel("Nom de la nouvelle allée")
                 }
@@ -70,8 +74,10 @@ struct AddMedicineView: View {
         .navigationTitle("Nouveau médicament")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if selectedAisle.isEmpty {
-                selectedAisle = viewModel.aisles.first ?? newAisleTag
+            if let first = viewModel.aisles.first {
+                selectedAisle = .existing(first)
+            } else {
+                selectedAisle = .new
             }
         }
     }
@@ -83,21 +89,25 @@ struct AddMedicineView: View {
             return false
         }
 
-        if selectedAisle == newAisleTag {
-            return !newAisle.isEmpty
-        }
-
-        return !selectedAisle.isEmpty
+        switch selectedAisle {
+            case .existing:
+                return true
+            case .new:
+                return !newAisle.isEmpty
+            }
     }
 
     // MARK: - Action
     private func addMedicine() {
         guard let stockValue = Int(stock) else { return }
 
-        let aisle = selectedAisle == newAisleTag
-        ? newAisle
-        : selectedAisle
-
+        let aisle: String
+            switch selectedAisle {
+            case .existing(let value):
+                aisle = value
+            case .new:
+                aisle = newAisle
+            }
         let medicine = Medicine(
             name: name,
             stock: stockValue,

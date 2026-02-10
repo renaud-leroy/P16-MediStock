@@ -9,7 +9,6 @@ struct MedicineDetailView: View {
     @State private var editedStock: Int = 0
     @State private var editedName: String = ""
     @State private var editedAisle: String = ""
-    @State private var isEditingStock = false
     @State private var isEditing = false
 
     let medicineId: String
@@ -55,7 +54,6 @@ struct MedicineDetailView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isEditing.toggle()
-                    isEditingStock = false
                     if !isEditing {
                         guard let userId = session.session?.uid else { return }
                         Task {
