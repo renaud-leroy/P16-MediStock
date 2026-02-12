@@ -82,7 +82,7 @@ final class MedicineStockViewModelTests: XCTestCase {
         let medicine = Medicine(id: "1", name: "ibuprofen", stock: 5, aisle: "B")
 
         // When
-        await viewModel.addMedicine(medicine)
+        await viewModel.addMedicine(medicine, user: "Renaud")
 
         // Then
         XCTAssertEqual(repository.medicines.count, 1)
@@ -95,7 +95,7 @@ final class MedicineStockViewModelTests: XCTestCase {
         let medicine = Medicine(id: "1", name: "Test", stock: 1, aisle: "A")
 
         // When
-        await viewModel.addMedicine(medicine)
+        await viewModel.addMedicine(medicine, user: "Renaud")
 
         // Then
         XCTAssertNotNil(viewModel.errorMessage)
@@ -222,7 +222,7 @@ final class MedicineStockViewModelTests: XCTestCase {
         let medicine = Medicine(id: "1", name: "Test", stock: 1, aisle: "A")
 
         // When
-        await viewModel.addMedicine(medicine)
+        await viewModel.addMedicine(medicine, user: "Renaud")
 
         // Then
         XCTAssertEqual(viewModel.errorMessage, "Une erreur inattendue est survenue.")

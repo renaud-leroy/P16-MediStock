@@ -22,7 +22,7 @@ final class MockMedicineRepository: MedicineRepositoryProtocol {
     var shouldThrowError = false
     var errorToThrow: Error = TestError.generic
 
-    func addMedicine(_ medicine: MediStock.Medicine) async throws {
+    func addMedicine(_ medicine: MediStock.Medicine, user: String) async throws {
         if shouldThrowError {
             throw errorToThrow
         }

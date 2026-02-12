@@ -38,6 +38,7 @@ struct AllMedicinesView: View {
                     if isLoading {
                         Spacer()
                         ProgressView("Medicine loading...")
+                            .tint(.pink)
                         Spacer()
                     } else {
                         List {
