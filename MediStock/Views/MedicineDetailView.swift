@@ -55,7 +55,8 @@ struct MedicineDetailView: View {
                 Button {
                     isEditing.toggle()
                     if !isEditing {
-                        guard let userId = session.session?.uid else { return }
+                        guard let user = session.session else { return }
+                        let userId = user.email ?? user.uid
                         Task {
                             await viewModel.saveChanges(
                                 for: medicine,
@@ -80,6 +81,7 @@ struct MedicineDetailView: View {
                 }
             }
         }
+        .tint(.primary)
         .task {
             await viewModel.loadHistory(for: medicineId)
         }

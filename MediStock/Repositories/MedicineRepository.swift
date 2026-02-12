@@ -11,7 +11,7 @@ import Firebase
 // MARK: - Protocol
 
 protocol MedicineRepositoryProtocol {
-    func addMedicine(_ medicine: Medicine) async throws
+    func addMedicine(_ medicine: Medicine, user: String) async throws
     func updateMedicine(_ medicine: Medicine, user: String) async throws
     func deleteMedicine(id: String) async throws
     func fetchMedicines(aisle: String?, searchText: String?, showOnlyInStock: Bool, sortBy: MedicineSortOption) async throws -> [Medicine]
@@ -29,7 +29,7 @@ final class FirestoreMedicineRepository: MedicineRepositoryProtocol {
     
     // MARK: - CRUD
     
-    func addMedicine(_ medicine: Medicine) async throws {
+    func addMedicine(_ medicine: Medicine, user: String) async throws {
         do {
             // Création de l'id en local
             let docRef = db.collection("medicines").document()
@@ -44,7 +44,7 @@ final class FirestoreMedicineRepository: MedicineRepositoryProtocol {
             // Ajout de la trace de l'id dans l'historique
             let history = HistoryEntry(
                 medicineId: docRef.documentID,
-                user: "system",
+                user: user,
                 action: "Add medicine",
                 details: "Medicine added"
             )

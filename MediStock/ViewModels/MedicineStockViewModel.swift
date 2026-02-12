@@ -90,9 +90,9 @@ final class MedicineStockViewModel: ObservableObject {
         }
     }
     
-    func addMedicine(_ medicine: Medicine) async {
+    func addMedicine(_ medicine: Medicine, user: String) async {
         do {
-            try await repository.addMedicine(medicine)
+            try await repository.addMedicine(medicine, user: user)
             await loadMedicines()
         } catch {
             if let error = error as? LocalizedError {

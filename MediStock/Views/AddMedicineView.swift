@@ -14,6 +14,7 @@ enum AisleSelection: Hashable {
 
 struct AddMedicineView: View {
     @EnvironmentObject var viewModel: MedicineStockViewModel
+    @EnvironmentObject var session: SessionStore
     @Environment(\.dismiss) private var dismiss
     @State private var name: String = ""
     @State private var stock: String = ""
@@ -113,9 +114,12 @@ struct AddMedicineView: View {
             stock: stockValue,
             aisle: aisle
         )
+        
+        guard let user = session.session else { return }
+        let userId = user.email ?? user.uid
 
         Task {
-            await viewModel.addMedicine(medicine)
+            await viewModel.addMedicine(medicine, user: userId)
             dismiss()
         }
     }
